@@ -7,7 +7,6 @@ import 'package:instagram_with_provider/responsive/mobilescreen_layout.dart';
 import 'package:instagram_with_provider/responsive/responsive_layout_screen.dart';
 import 'package:instagram_with_provider/responsive/webscreen_layout.dart';
 import 'package:instagram_with_provider/screens/login_screen.dart';
-import 'package:instagram_with_provider/screens/signup_screen.dart';
 import 'package:instagram_with_provider/utils/colors.dart';
 import 'package:provider/provider.dart';
 

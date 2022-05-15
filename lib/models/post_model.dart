@@ -7,8 +7,8 @@ class PostModel {
   final String postId;
   final String postUrl;
   final String profileImage;
-  final datePublished;
-  final likes;
+  final DateTime datePublished;
+  final List likes;
 
   PostModel({
     required this.uid,

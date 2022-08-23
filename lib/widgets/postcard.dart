@@ -26,12 +26,15 @@ class _PostCardState extends State<PostCard> {
     try {
       QuerySnapshot snap = await FirebaseFirestore.instance
           .collection('posts')
-          .doc(widget.snap['postId'])
+          .doc(widget.snap['post_id'])
           .collection('comments')
           .get();
 
       commentLength = snap.docs.length;
-    } catch (e) {}
+      setState(() {});
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -59,7 +62,7 @@ class _PostCardState extends State<PostCard> {
                 CircleAvatar(
                   radius: 16.0,
                   backgroundImage:
-                      NetworkImage('${widget.snap['profileImage']}'),
+                      NetworkImage('${widget.snap['profile_image']}'),
                 ),
                 Expanded(
                   child: Padding(
@@ -91,7 +94,7 @@ class _PostCardState extends State<PostCard> {
                                     .map((e) => InkWell(
                                           onTap: () {
                                             FirestoreMethod().deletePost(
-                                                widget.snap['postId']);
+                                                widget.snap['post_id']);
                                             Navigator.pop(context);
                                           },
                                           child: Container(
@@ -115,7 +118,7 @@ class _PostCardState extends State<PostCard> {
             onDoubleTap: () async {
               await FirestoreMethod().likePost(
                 user.uid,
-                widget.snap['postId'],
+                widget.snap['post_id'],
                 widget.snap['likes'],
               );
 
@@ -130,7 +133,7 @@ class _PostCardState extends State<PostCard> {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * .35,
                   child: Image.network(
-                    '${widget.snap['postUrl']}',
+                    '${widget.snap['image_url']}',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -164,7 +167,7 @@ class _PostCardState extends State<PostCard> {
                 child: IconButton(
                   onPressed: () async {
                     await FirestoreMethod().likePost(
-                        user.uid, widget.snap['postId'], widget.snap['likes']);
+                        user.uid, widget.snap['post_id'], widget.snap['likes']);
                   },
                   icon: Icon(
                     Icons.favorite,
@@ -247,7 +250,7 @@ class _PostCardState extends State<PostCard> {
                 Container(
                   child: Text(
                     DateFormat.yMMMd()
-                        .format(widget.snap['datePublished'].toDate()),
+                        .format(widget.snap['publishedAt'].toDate()),
                     style: const TextStyle(
                       fontSize: 16.0,
                       color: secondaryColor,

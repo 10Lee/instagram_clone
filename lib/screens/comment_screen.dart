@@ -41,19 +41,22 @@ class _CommentScreenState extends State<CommentScreen> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('posts')
-            .doc(widget.snap['postId'])
+            .doc(widget.snap['post_id'])
             .collection('comments')
             .orderBy('datePublished', descending: true)
             .snapshots(),
-        builder: (context,
-            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+        builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          return ListView.builder(
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            print(snapshot.data!.docs.length);
+            return ListView.builder(
               itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) =>
-                  CommentCard(snap: snapshot.data!.docs[index].data()));
+              itemBuilder: (context, index) => CommentCard(
+                snap: snapshot.data!.docs[index].data(),
+              ),
+            );
+          }
         },
       ),
       bottomNavigationBar: SafeArea(
@@ -82,7 +85,7 @@ class _CommentScreenState extends State<CommentScreen> {
               TextButton(
                 onPressed: () async {
                   await FirestoreMethod().postComments(
-                    widget.snap['postId'],
+                    widget.snap['post_id'],
                     commentController.text,
                     user.uid,
                     user.username,

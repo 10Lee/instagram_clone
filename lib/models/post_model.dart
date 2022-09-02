@@ -25,10 +25,10 @@ class PostModel {
         'uid': uid,
         'description': description,
         'username': username,
-        'postId': postId,
-        'postUrl': postUrl,
-        'profileImage': profileImage,
-        'datePublished': datePublished,
+        'post_id': postId,
+        'image_url': postUrl,
+        'profile_image': profileImage,
+        'publishedAt': datePublished,
         'likes': likes,
       };
 
@@ -39,10 +39,10 @@ class PostModel {
       uid: snapshot['uid'],
       description: snapshot['description'],
       username: snapshot['username'],
-      postId: snapshot['postId'],
-      postUrl: snapshot['postUrl'],
-      profileImage: snapshot['profileImage'],
-      datePublished: snapshot['datePublished'],
+      postId: snapshot['post_id'],
+      postUrl: snapshot['image_url'],
+      profileImage: snapshot['profile_image'],
+      datePublished: snapshot['publishedAt'],
       likes: snapshot['likes'],
     );
   }

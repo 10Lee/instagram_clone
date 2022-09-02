@@ -69,12 +69,12 @@ class FirestoreMethod {
             .doc(commentId)
             .set(
           {
-            'profileImage': profileImage,
+            'profile_image': profileImage,
             'name': name,
             'uid': uid,
             'text': text,
             'commentId': commentId,
-            'datePublished': DateTime.now(),
+            'publishedAt': DateTime.now(),
           },
         );
       } else {

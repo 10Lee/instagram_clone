@@ -63,6 +63,8 @@ class _PostCardState extends State<PostCard> {
                   radius: 16.0,
                   backgroundImage:
                       NetworkImage('${widget.snap['profile_image']}'),
+                  onBackgroundImageError: (exception, stackTrace) =>
+                      const CircularProgressIndicator(),
                 ),
                 Expanded(
                   child: Padding(
@@ -73,7 +75,7 @@ class _PostCardState extends State<PostCard> {
                       children: [
                         Text(
                           '${widget.snap['username']}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:instagram_with_provider/screens/profile_screen.dart';
 import 'package:instagram_with_provider/utils/colors.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -65,12 +66,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemBuilder: (context, index) {
                     final data = snapshot.data!.docs[index];
 
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        backgroundImage: NetworkImage(data['profile_url']),
+                    return InkWell(
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ProfileScreen(uid: data['uid']))),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          backgroundImage: NetworkImage(data['profile_url']),
+                        ),
+                        title: Text("${data['username']}"),
                       ),
-                      title: Text("${data['username']}"),
                     );
                   },
                 );

@@ -92,4 +92,33 @@ class FirestoreMethod {
       print(e.toString());
     }
   }
+
+  // Follow functionality
+  Future<void> followUser(String originID, String targetID) async {
+    try {
+      var snap = await _firestore.collection('users').doc(originID).get();
+
+      List followingList = snap.data()!['following'];
+
+      // If there is uid listed in firestore, remove it
+      if (followingList.contains(targetID)) {
+        await _firestore.collection('users').doc(targetID).update({
+          'followers': FieldValue.arrayRemove([originID])
+        });
+        await _firestore.collection('users').doc(originID).update({
+          'following': FieldValue.arrayRemove([targetID])
+        });
+      } else {
+        // if the comparable uid is not listed add it
+        await _firestore.collection('users').doc(targetID).update({
+          'followers': FieldValue.arrayUnion([originID])
+        });
+        await _firestore.collection('users').doc(originID).update({
+          'following': FieldValue.arrayUnion([targetID])
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

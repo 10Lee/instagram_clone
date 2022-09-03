@@ -3,6 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:instagram_with_provider/resources/auth_methods.dart';
+import 'package:instagram_with_provider/resources/firestore_method.dart';
+import 'package:instagram_with_provider/responsive/mobilescreen_layout.dart';
+import 'package:instagram_with_provider/responsive/responsive_layout_screen.dart';
+import 'package:instagram_with_provider/responsive/webscreen_layout.dart';
+import 'package:instagram_with_provider/screens/login_screen.dart';
 
 import 'package:instagram_with_provider/utils/colors.dart';
 import 'package:instagram_with_provider/utils/utils.dart';
@@ -26,6 +32,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int following = 0;
   int followers = 0;
 
+  bool isFollowing = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +50,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       userData = fetchUser.data()!;
       following = fetchUser.data()!['following'].length;
       followers = fetchUser.data()!['followers'].length;
+      isFollowing = fetchUser
+          .data()!['followers']
+          .contains(FirebaseAuth.instance.currentUser!.uid);
 
       var fetchPost = await FirebaseFirestore.instance
           .collection('posts')
@@ -60,6 +71,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // leading: IconButton(
+        //   onPressed: () => Navigator.pushReplacement(
+        //       context,
+        //       MaterialPageRoute(
+        //           builder: (_) => const ResponsiveLayout(
+        //               webScreenLayout: WebScreenLayout(),
+        //               mobileScreenLayout: MobileScreenLayout()))),
+        //   icon: const Icon(Icons.arrow_back),
+        // ),
         backgroundColor: mobileBackground,
         centerTitle: false,
         title: Text(userData['username'].toString()),
@@ -148,14 +168,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 10.0),
-                      Container(
-                        margin: const EdgeInsets.all(20.0),
-                        height: 40.0,
-                        decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.white),
-                            borderRadius: BorderRadius.circular(15.0)),
-                        child: const Center(child: Text("Edit Profile")),
-                      ),
+                      FirebaseAuth.instance.currentUser!.uid == widget.uid
+                          ? InkWell(
+                              onTap: () {
+                                AuthMethods().logOuUser();
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const LoginScreen()));
+                                setState(() {});
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.all(5.0),
+                                height: 40.0,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.white),
+                                    borderRadius: BorderRadius.circular(5.0)),
+                                child: const Center(child: Text("Log Out")),
+                              ),
+                            )
+                          : !isFollowing
+                              ? ElevatedButton(
+                                  onPressed: () async {
+                                    FirestoreMethod().followUser(
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        userData['uid']);
+                                    setState(() {
+                                      isFollowing = true;
+                                      followers++;
+                                    });
+                                  },
+                                  child: const Center(child: Text("Follow")))
+                              : ElevatedButton(
+                                  onPressed: () async {
+                                    FirestoreMethod().followUser(
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        userData['uid']);
+
+                                    setState(() {
+                                      isFollowing = false;
+                                      followers--;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.red),
+                                  child: const Center(child: Text("Unfollow")))
                     ],
                   ),
                 ),
@@ -169,6 +227,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 5.0),
           Text(userData['bio'].toString()),
+          const Divider(),
+          FutureBuilder(
+            future: FirebaseFirestore.instance
+                .collection('posts')
+                .where('uid', isEqualTo: widget.uid)
+                .get(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              return GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 1.5,
+                  childAspectRatio: 1,
+                ),
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> postData =
+                      (snapshot.data! as dynamic).docs[index].data();
+
+                  return Container(
+                    child: Image(
+                      image: NetworkImage(postData['image_url']),
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Center(child: CircularProgressIndicator()),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
     );
